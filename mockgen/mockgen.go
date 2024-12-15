@@ -38,6 +38,8 @@ import (
 	"unicode"
 
 	"golang.org/x/mod/modfile"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	toolsimports "golang.org/x/tools/imports"
 
 	"go.uber.org/mock/mockgen/model"
@@ -452,11 +454,14 @@ func (g *generator) Generate(pkg *model.Package, outputPkgName string, outputPac
 
 // The name of the mock type to use for the given interface identifier.
 func (g *generator) mockName(typeName string) string {
-	if mockName, ok := g.mockNames[typeName]; ok {
-		return mockName
+	if g.mockNames != nil {
+		if mockName, ok := g.mockNames[typeName]; ok {
+			return mockName
+		}
 	}
 
-	return "Mock" + typeName
+	// typeName cannot be empty, no bounds check
+	return "Mock" + cases.Title(language.Und).String(typeName[:1]) + typeName[1:]
 }
 
 // formattedTypeParams returns a long and short form of type param info used for
