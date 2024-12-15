@@ -467,3 +467,41 @@ func TestParseExcludeInterfaces(t *testing.T) {
 		})
 	}
 }
+
+func TestMockName(t *testing.T) {
+	testCases := []struct {
+		name     string
+		instance *generator
+		arg      string
+		expected string
+	}{
+		{
+			name:     "one char private",
+			instance: &generator{},
+			arg:      "i",
+			expected: "MockI",
+		},
+		{
+			name:     "full name private",
+			instance: &generator{},
+			arg:      "requiredInterface",
+			expected: "MockRequiredInterface",
+		},
+		{
+			name:     "full name exported",
+			instance: &generator{},
+			arg:      "MyRequirement",
+			expected: "MockMyRequirement",
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			res := tt.instance.mockName(tt.arg)
+
+			if !reflect.DeepEqual(res, tt.expected) {
+				t.Errorf("expected %v, actual %v", tt.expected, res)
+			}
+		})
+	}
+}
